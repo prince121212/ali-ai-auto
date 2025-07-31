@@ -5,11 +5,15 @@ __pycache__/
 **/screenshot/*
 **/temp/*
 
+# API密钥相关文件
 *openai_key*
 *qwen_key*
 *api_key*
 *gemini_key*
 *claude_key*
+config_local.ps1
+config_personal.ps1
+*_config.ps1
 logs/*
 README_submission.md
 screenshot/*
