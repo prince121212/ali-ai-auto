@@ -80,7 +80,7 @@ pip install -r requirements.txt
     ```
     export ADB_PATH="your/path/to/adb"
     ```
-2. 主干模型和 API 密钥：您可以从 OpenAI、Gemini 和 Claude 中选择；按如下方式设置相应的密钥：
+2. 主干模型和 API 密钥：您可以从 OpenAI、Gemini、Claude、Qwen 和 GLM 中选择；按如下方式设置相应的密钥：
     ```
     export BACKBONE_TYPE="OpenAI"
     export OPENAI_API_KEY="your-openai-key"
@@ -93,7 +93,26 @@ pip install -r requirements.txt
     export BACKBONE_TYPE="Claude"
     export CLAUDE_API_KEY="your-claude-key"
     ```
-3. 感知器：默认情况下，感知器中的图标描述模型（`CAPTION_MODEL`）使用来自 Qwen API 的"qwen-vl-max"：
+    ```
+    export BACKBONE_TYPE="Qwen"
+    export QWEN_REASONING_API_KEY="your-qwen-reasoning-key"
+    ```
+    ```
+    export BACKBONE_TYPE="GLM"
+    export GLM_API_KEY="your-glm-api-key"
+    ```
+3. GLM-4.5-x 模型配置（新增）：
+    - GLM-4.5-x 是智谱AI推出的新旗舰模型，具有强大的推理、编码和智能体能力
+    - 按照此链接获取 [智谱AI API Key](https://docs.bigmodel.cn/cn/guide/start/quick-start)
+    - 设置 GLM API 密钥：
+        ```
+        export BACKBONE_TYPE="GLM"
+        export GLM_API_KEY="your-glm-api-key"
+        ```
+    - GLM-4.5-x 支持深度思考模式，提供更深层次的推理分析
+    - 模型特点：高性能、强推理、极速响应，适合智能体应用
+
+4. 感知器：默认情况下，感知器中的图标描述模型（`CAPTION_MODEL`）使用来自 Qwen API 的"qwen-vl-max"：
     - 按照此链接获取 [Qwen API Key](https://help.aliyun.com/document_detail/2712195.html?spm=a2c4g.2712569.0.0.5d9e730aymB3jH)
     - 设置 Qwen API 密钥：
         ```
@@ -102,7 +121,7 @@ pip install -r requirements.txt
     - 您可以在 `inference_agent_E.py` 中将 `CAPTION_MODEL` 设置为"qwen-vl-max"以获得更好的感知性能，但价格更高。
     - 如果您的机器配备了高性能 GPU，您也可以选择在本地托管图标描述模型：(1) 将 `CAPTION_CALL_METHOD` 设置为"local"；(2) 根据 GPU 规格将 `CAPTION_MODEL` 设置为'qwen-vl-chat'或'qwen-vl-chat-int4'。
 
-4. 自定义初始提示：您可以根据您的特定设备和需求定制 agent 的提示。为此，请修改 `inference_agent_E.py` 中的 `INIT_TIPS`。在 `data/custom_tips_example_for_cn_apps.txt` 中提供了针对小红书和淘宝等中文应用的自定义提示示例。
+5. 自定义初始提示：您可以根据您的特定设备和需求定制 agent 的提示。为此，请修改 `inference_agent_E.py` 中的 `INIT_TIPS`。在 `data/custom_tips_example_for_cn_apps.txt` 中提供了针对小红书和淘宝等中文应用的自定义提示示例。
 
 ## 🚀 快速开始
 

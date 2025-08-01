@@ -35,8 +35,8 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 ADB_PATH = os.environ.get("ADB_PATH", default="adb")
 
 ## Reasoning model configs
-BACKBONE_TYPE = os.environ.get("BACKBONE_TYPE", default="Qwen") # "OpenAI" or "Gemini" or "Claude" or "Qwen"
-assert BACKBONE_TYPE in ["OpenAI", "Gemini", "Claude", "Qwen"], "Unknown BACKBONE_TYPE"
+BACKBONE_TYPE = os.environ.get("BACKBONE_TYPE", default="Qwen") # "OpenAI" or "Gemini" or "Claude" or "Qwen" or "GLM"
+assert BACKBONE_TYPE in ["OpenAI", "Gemini", "Claude", "Qwen", "GLM"], "Unknown BACKBONE_TYPE"
 print("### Using BACKBONE_TYPE:", BACKBONE_TYPE)
 
 OPENAI_API_URL = "https://api.openai.com/v1/chat/completions"
@@ -51,6 +51,9 @@ CLAUDE_API_KEY = os.environ.get("CLAUDE_API_KEY", default=None)
 QWEN_REASONING_API_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
 QWEN_REASONING_API_KEY = os.environ.get("QWEN_REASONING_API_KEY", default=None)
 
+GLM_API_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
+GLM_API_KEY = os.environ.get("GLM_API_KEY", default=None)
+
 if BACKBONE_TYPE == "OpenAI":
     REASONING_MODEL = "gpt-4o-2024-11-20"
     KNOWLEDGE_REFLECTION_MODEL = "gpt-4o-2024-11-20"
@@ -63,6 +66,9 @@ elif BACKBONE_TYPE == "Claude":
 elif BACKBONE_TYPE == "Qwen":
     REASONING_MODEL = "qwen-plus-latest"
     KNOWLEDGE_REFLECTION_MODEL = "qwen-plus-latest"
+elif BACKBONE_TYPE == "GLM":
+    REASONING_MODEL = "glm-4.5-x"
+    KNOWLEDGE_REFLECTION_MODEL = "glm-4.5-x"
 
 ## 您可以指定一个 jsonl 文件路径来跟踪 API 使用情况
 USAGE_TRACKING_JSONL = None # 例如：usage_tracking.jsonl
@@ -393,6 +399,8 @@ def get_reasoning_model_api_response(chat, model_type=BACKBONE_TYPE, model=None,
         return inference_chat(chat, model, CLAUDE_API_URL, CLAUDE_API_KEY, usage_tracking_jsonl=USAGE_TRACKING_JSONL, temperature=temperature)
     elif model_type == "Qwen":
         return inference_chat(chat, model, QWEN_REASONING_API_URL, QWEN_REASONING_API_KEY, usage_tracking_jsonl=USAGE_TRACKING_JSONL, temperature=temperature)
+    elif model_type == "GLM":
+        return inference_chat(chat, model, GLM_API_URL, GLM_API_KEY, usage_tracking_jsonl=USAGE_TRACKING_JSONL, temperature=temperature)
     else:
         raise ValueError(f"Unknown model type: {model_type}")
     

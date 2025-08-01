@@ -11,7 +11,6 @@ __pycache__/
 *api_key*
 *gemini_key*
 *claude_key*
-config_local.ps1
 config_personal.ps1
 *_config.ps1
 logs/*
