@@ -30,35 +30,35 @@ def start_recording(adb_path):
     return process
 
 def end_recording(adb_path, output_recording_path):
-    print("Stopping recording...")
-    # Send SIGINT to stop the screenrecord process gracefully
+    print("正在停止录制...")
+    # 发送 SIGINT 信号优雅地停止 screenrecord 进程
     stop_command = adb_path + " shell pkill -SIGINT screenrecord"
     subprocess.run(stop_command, capture_output=True, text=True, shell=True)
-    sleep(1)  # Allow some time to ensure the recording is stopped
-    
-    print("Pulling recorded file from device...")
+    sleep(1)  # 留出一些时间确保录制已停止
+
+    print("正在从设备拉取录制文件...")
     pull_command = f"{adb_path} pull /sdcard/screenrecord.mp4 {output_recording_path}"
     subprocess.run(pull_command, capture_output=True, text=True, shell=True)
-    print(f"Recording saved to {output_recording_path}")
+    print(f"录制已保存到 {output_recording_path}")
 
 
 def save_screenshot_to_file(adb_path, file_path="screenshot.png"):
     """
-    Captures a screenshot from an Android device using ADB, saves it locally, and removes the screenshot from the device.
+    使用 ADB 从 Android 设备捕获截图，保存到本地，并从设备中删除截图。
 
-    Args:
-        adb_path (str): The path to the adb executable.
+    参数:
+        adb_path (str): adb 可执行文件的路径。
 
-    Returns:
-        str: The path to the saved screenshot, or raises an exception on failure.
+    返回:
+        str: 保存的截图路径，失败时抛出异常。
     """
-    # Define the local filename for the screenshot
+    # 定义截图的本地文件名
     local_file = file_path
-    
+
     if os.path.dirname(local_file) != "":
         os.makedirs(os.path.dirname(local_file), exist_ok=True)
 
-    # Define the temporary file path on the Android device
+    # 定义 Android 设备上的临时文件路径
     device_file = "/sdcard/screenshot.png"
     
     try:

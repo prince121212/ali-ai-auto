@@ -61,36 +61,36 @@ elif BACKBONE_TYPE == "Claude":
     REASONING_MODEL = "claude-3-5-sonnet-20241022"
     KNOWLEDGE_REFLECTION_MODEL = "claude-3-5-sonnet-20241022"
 elif BACKBONE_TYPE == "Qwen":
-    REASONING_MODEL = "qwen3-235b-a22b-instruct-2507"
-    KNOWLEDGE_REFLECTION_MODEL = "qwen3-235b-a22b-instruct-2507"
+    REASONING_MODEL = "qwen-plus-latest"
+    KNOWLEDGE_REFLECTION_MODEL = "qwen-plus-latest"
 
-## you can specify a jsonl file path for tracking API usage
-USAGE_TRACKING_JSONL = None # e.g., usage_tracking.jsonl
+## 您可以指定一个 jsonl 文件路径来跟踪 API 使用情况
+USAGE_TRACKING_JSONL = None # 例如：usage_tracking.jsonl
 
-## Perceptor configs
-# Choose between "api" and "local". api: use the qwen api. local: use the local qwen checkpoint
+## 感知器配置
+# 在 "api" 和 "local" 之间选择。api：使用 qwen api。local：使用本地 qwen checkpoint
 CAPTION_CALL_METHOD = "api"
-# Choose between "qwen-vl-plus" and "qwen-vl-max" if use api method. Choose between "qwen-vl-chat" and "qwen-vl-chat-int4" if use local method.
-CAPTION_MODEL = "qwen-vl-plus"
+# 如果使用 api 方法，在 "qwen-vl-max" 和 "qwen-vl-max" 之间选择。如果使用 local 方法，在 "qwen-vl-chat" 和 "qwen-vl-chat-int4" 之间选择。
+CAPTION_MODEL = "qwen-vl-max"
 
 QWEN_API_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
 QWEN_API_KEY = os.environ.get("QWEN_API_KEY", default=None)
 
 
-## Initial Tips provided by user; You can add additional custom tips ###
-INIT_TIPS = """0. Do not add any payment information. If you are asked to sign in, ignore it or sign in as a guest if possible. Close any pop-up windows when opening an app.
-1. By default, no APPs are opened in the background.
-2. Screenshots may show partial text in text boxes from your previous input; this does not count as an error.
-3. When creating new Notes, you do not need to enter a title unless the user specifically requests it.
+## 用户提供的初始提示；您可以添加额外的自定义提示 ###
+INIT_TIPS = """0. 不要添加任何付款信息。如果要求您登录，请忽略或尽可能以访客身份登录。打开应用时关闭任何弹出窗口。
+1. 默认情况下，后台没有打开任何应用。
+2. 截图可能会显示您之前输入的文本框中的部分文本；这不算作错误。
+3. 创建新笔记时，除非用户特别要求，否则您不需要输入标题。
 """
 
-## other
+## 其他配置
 TEMP_DIR = "temp"
 SCREENSHOT_DIR = "screenshot"
 SLEEP_BETWEEN_STEPS = 5
 
 ###################################################################################################
-### Perception related functions ###
+### 感知相关函数 ###
 
 def get_all_files_in_folder(folder_path):
     file_list = []
@@ -148,7 +148,7 @@ def process_image(image, query, caption_model=CAPTION_MODEL):
     try:
         response = response['output']['choices'][0]['message']['content'][0]["text"]
     except:
-        response = "This is an icon."
+        response = "这是一个图标。"
     
     return response
 
@@ -332,7 +332,7 @@ class Perceptor:
             images = sorted(images, key=lambda x: int(x.split('/')[-1].split('.')[0]))
             image_id = [int(image.split('/')[-1].split('.')[0]) for image in images]
             icon_map = {}
-            prompt = 'This image is an icon from a phone screen. Please briefly describe the shape and color of this icon in one sentence.'
+            prompt = '这张图片是手机屏幕上的一个图标。请用一句话简要描述这个图标的形状和颜色。'
             if CAPTION_CALL_METHOD == "local":
                 for i in range(len(images)):
                     image_path = os.path.join(temp_file, images[i])
@@ -363,18 +363,18 @@ def finish(
         persistent_shortcuts_path=None
     ):
     
-    print("Plan:", info_pool.plan)
-    print("Progress Logs:")
+    print("计划:", info_pool.plan)
+    print("进度日志:")
     for i, p in enumerate(info_pool.progress_status_history):
-        print(f"Step {i}:", p, "\n")
-    print("Important Notes:", info_pool.important_notes)
-    print("Finish Thought:", info_pool.finish_thought)
+        print(f"步骤 {i}:", p, "\n")
+    print("重要笔记:", info_pool.important_notes)
+    print("完成思考:", info_pool.finish_thought)
     if persistent_tips_path:
-        print("Update persistent tips:", persistent_tips_path)
+        print("更新持久化提示:", persistent_tips_path)
         with open(persistent_tips_path, "w") as f:
             f.write(info_pool.tips)
     if persistent_shortcuts_path:
-        print("Update persistent shortcuts:", persistent_shortcuts_path)
+        print("更新持久化快捷方式:", persistent_shortcuts_path)
         with open(persistent_shortcuts_path, "w") as f:
             json.dump(info_pool.shortcuts, f, indent=4)
     # exit(0)
@@ -451,23 +451,23 @@ def run_single_task(
         initial_shortcuts = json.load(open(persistent_shortcuts_path, "r"))
     else:
         initial_shortcuts = copy.deepcopy(INIT_SHORTCUTS)
-    print("INFO: Initial shortcuts:", initial_shortcuts)
-    
-    
+    print("信息: 初始快捷方式:", initial_shortcuts)
+
+
     if tips_path:
-        tips = open(tips_path, "r").read() # load agent updated tips
+        tips = open(tips_path, "r").read() # 加载 agent 更新的提示
     elif persistent_tips_path:
         tips = open(persistent_tips_path, "r").read()
     else:
-        tips = copy.deepcopy(INIT_TIPS) # user provided initial tips
-    print("INFO: Initial tips:", tips)
+        tips = copy.deepcopy(INIT_TIPS) # 用户提供的初始提示
+    print("信息: 初始提示:", tips)
 
     steps = []
     task_start_time = time.time()
 
-    ## additional retrieval step before starting the task for selecting relevant tips and shortcuts ##
+    ## 在开始任务前的额外检索步骤，用于选择相关的提示和快捷方式 ##
     if enable_experience_retriever:
-        print("### Doing retrieval on provided Tips and Shortcuts ... ###")
+        print("### 正在对提供的提示和快捷方式进行检索... ###")
         experience_retrieval_log = {
             "step": -1,
             "operation": "experience_retrieval",
@@ -535,7 +535,7 @@ def run_single_task(
         err_to_manager_thresh=err_to_manager_thresh
     )
 
-    ### temp dir ###
+    ### 临时目录 ###
     if not os.path.exists(TEMP_DIR):
         os.mkdir(TEMP_DIR)
     else:
@@ -544,9 +544,9 @@ def run_single_task(
     if not os.path.exists(SCREENSHOT_DIR):
         os.mkdir(SCREENSHOT_DIR)
 
-    ### Init Agents ###
+    ### 初始化 Agents ###
     if perceptor is None:
-        # if perceptor is not initialized, create the perceptor
+        # 如果感知器未初始化，创建感知器
         perceptor = Perceptor(ADB_PATH, perception_args=perception_args)
     manager = Manager()
     operator = Operator(adb_path=ADB_PATH)

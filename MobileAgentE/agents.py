@@ -186,18 +186,18 @@ class Manager(BaseAgent):
 
     def init_chat(self):
         operation_history = []
-        sysetm_prompt = "You are a helpful AI assistant for operating mobile phones. Your goal is to track progress and devise high-level plans to achieve the user's requests. Think as if you are a human user operating the phone."
+        sysetm_prompt = "您是一个用于操作手机的有用AI助手。您的目标是跟踪进度并制定高级计划来实现用户的请求。请像人类用户操作手机一样思考。"
         operation_history.append(["system", [{"type": "text", "text": sysetm_prompt}]])
         return operation_history
 
     def get_prompt(self, info_pool: InfoPool) -> str:
-        prompt = "### User Instruction ###\n"
+        prompt = "### 用户指令 ###\n"
         prompt += f"{info_pool.instruction}\n\n"
 
         if info_pool.plan == "":
-            # first time planning
+            # 首次规划
             prompt += "---\n"
-            prompt += "Think step by step and make an high-level plan to achieve the user's instruction. If the request is complex, break it down into subgoals. If the request involves exploration, include concrete subgoals to quantify the investigation steps. The screenshot displays the starting state of the phone.\n\n"
+            prompt += "逐步思考并制定一个高级计划来实现用户的指令。如果请求复杂，将其分解为子目标。如果请求涉及探索，包括具体的子目标来量化调查步骤。截图显示了手机的起始状态。\n\n"
             
             if info_pool.shortcuts != {}:
                 prompt += "### Available Shortcuts from Past Experience ###\n"
@@ -268,23 +268,23 @@ class Manager(BaseAgent):
         return {"thought": thought, "plan": plan, "current_subgoal": current_subgoal}
 
 
-# name: {arguments: [argument_keys], description: description}
+# 名称: {参数: [参数键], 描述: 描述}
 ATOMIC_ACTION_SIGNITURES = {
     "Open_App": {
         "arguments": ["app_name"],
-        "description": lambda info: "If the current screen is Home or App screen, you can use this action to open the app named \"app_name\" on the visible on the current screen."
+        "description": lambda info: "如果当前屏幕是主屏幕或应用屏幕，您可以使用此操作打开当前屏幕上可见的名为\"app_name\"的应用。"
     },
     "Tap": {
         "arguments": ["x", "y"],
-        "description": lambda info: "Tap the position (x, y) in current screen."
+        "description": lambda info: "点击当前屏幕中的位置 (x, y)。"
     },
     "Swipe": {
         "arguments": ["x1", "y1", "x2", "y2"],
-        "description": lambda info: f"Swipe from position (x1, y1) to position (x2, y2). To swipe up or down to review more content, you can adjust the y-coordinate offset based on the desired scroll distance. For example, setting x1 = x2 = {int(0.5 * info.width)}, y1 = {int(0.5 * info.height)}, and y2 = {int(0.1 * info.height)} will swipe upwards to review additional content below. To swipe left or right in the App switcher screen to choose between open apps, set the x-coordinate offset to at least {int(0.5 * info.width)}."
+        "description": lambda info: f"从位置 (x1, y1) 滑动到位置 (x2, y2)。要上下滑动查看更多内容，您可以根据所需的滚动距离调整y坐标偏移。例如，设置 x1 = x2 = {int(0.5 * info.width)}, y1 = {int(0.5 * info.height)}, y2 = {int(0.1 * info.height)} 将向上滑动以查看下方的其他内容。要在应用切换器屏幕中左右滑动选择打开的应用，请将x坐标偏移设置为至少 {int(0.5 * info.width)}。"
     },
     "Type": {
         "arguments": ["text"],
-        "description": lambda info: "Type the \"text\" in an input box."
+        "description": lambda info: "在输入框中输入\"text\"。"
     },
     "Enter": {
         "arguments": [],
@@ -312,8 +312,8 @@ INIT_SHORTCUTS = {
     "Tap_Type_and_Enter": {
         "name": "Tap_Type_and_Enter",
         "arguments": ["x", "y", "text"],
-        "description": "Tap an input box at position (x, y), Type the \"text\", and then perform the Enter operation. Very useful for searching and sending messages!",
-        "precondition": "There is a text input box on the screen with no previously entered content.",
+        "description": "点击位置 (x, y) 的输入框，输入\"text\"，然后执行回车操作。对搜索和发送消息非常有用！",
+        "precondition": "屏幕上有一个文本输入框，且没有之前输入的内容。",
         "atomic_action_sequence":[
             {"name": "Tap", "arguments_map": {"x":"x", "y":"y"}},
             {"name": "Type", "arguments_map": {"text":"text"}},
@@ -334,25 +334,25 @@ class Operator(BaseAgent):
         return operation_history
 
     def get_prompt(self, info_pool: InfoPool) -> str:
-        prompt = "### User Instruction ###\n"
+        prompt = "### 用户指令 ###\n"
         prompt += f"{info_pool.instruction}\n\n"
 
-        prompt += "### Overall Plan ###\n"
+        prompt += "### 总体计划 ###\n"
         prompt += f"{info_pool.plan}\n\n"
 
-        prompt += "### Progress Status ###\n"
+        prompt += "### 进度状态 ###\n"
         if info_pool.progress_status != "":
             prompt += f"{info_pool.progress_status}\n\n"
         else:
-            prompt += "No progress yet.\n\n"
+            prompt += "尚无进度。\n\n"
 
-        prompt += "### Current Subgoal ###\n"
+        prompt += "### 当前子目标 ###\n"
         prompt += f"{info_pool.current_subgoal}\n\n"
 
-        prompt += "### Screen Information ###\n"
+        prompt += "### 屏幕信息 ###\n"
         prompt += (
-            f"The attached image is a screenshot showing the current state of the phone. "
-            f"Its width and height are {info_pool.width} and {info_pool.height} pixels, respectively.\n"
+            f"附加的图像是显示手机当前状态的截图。"
+            f"其宽度和高度分别为 {info_pool.width} 和 {info_pool.height} 像素。\n"
         )
         prompt += (
             "To help you better understand the content in this screenshot, we have extracted positional information for the text elements and icons, including interactive elements such as search bars. "
@@ -367,35 +367,35 @@ class Operator(BaseAgent):
         prompt += "\n"
         prompt += (
             "Note that a search bar is often a long, rounded rectangle. If no search bar is presented and you want to perform a search, you may need to tap a search button, which is commonly represented by a magnifying glass.\n"
-            "Also, the information above might not be entirely accurate. "
-            "You should combine it with the screenshot to gain a better understanding."
+            "另外，上述信息可能不完全准确。"
+            "您应该结合截图来获得更好的理解。"
         )
         prompt += "\n\n"
 
-        prompt += "### Keyboard status ###\n"
+        prompt += "### 键盘状态 ###\n"
         if info_pool.keyboard_pre:
-            prompt += "The keyboard has been activated and you can type."
+            prompt += "键盘已激活，您可以输入。"
         else:
-            prompt += "The keyboard has not been activated and you can\'t type."
+            prompt += "键盘尚未激活，您无法输入。"
         prompt += "\n\n"
 
         if info_pool.tips != "":
-            prompt += "### Tips ###\n"
-            prompt += "From previous experience interacting with the device, you have collected the following tips that might be useful for deciding what to do next:\n"
+            prompt += "### 提示 ###\n"
+            prompt += "从之前与设备交互的经验中，您收集了以下可能对决定下一步操作有用的提示：\n"
             prompt += f"{info_pool.tips}\n\n"
 
-        prompt += "### Important Notes ###\n"
+        prompt += "### 重要笔记 ###\n"
         if info_pool.important_notes != "":
-            prompt += "Here are some potentially important content relevant to the user's request you already recorded:\n"
+            prompt += "以下是您已记录的与用户请求相关的一些潜在重要内容：\n"
             prompt += f"{info_pool.important_notes}\n\n"
         else:
-            prompt += "No important notes recorded.\n\n"
+            prompt += "未记录重要笔记。\n\n"
 
         prompt += "---\n"
-        prompt += "Carefully examine all the information provided above and decide on the next action to perform. If you notice an unsolved error in the previous action, think as a human user and attempt to rectify them. You must choose your action from one of the atomic actions or the shortcuts. The shortcuts are predefined sequences of actions that can be used to speed up the process. Each shortcut has a precondition specifying when it is suitable to use. If you plan to use a shortcut, ensure the current phone state satisfies its precondition first.\n\n"
+        prompt += "仔细检查上述提供的所有信息，并决定要执行的下一个操作。如果您注意到之前操作中有未解决的错误，请像人类用户一样思考并尝试纠正它们。您必须从原子操作或快捷方式中选择您的操作。快捷方式是预定义的操作序列，可用于加快流程。每个快捷方式都有一个前提条件，指定何时适合使用。如果您计划使用快捷方式，请首先确保当前手机状态满足其前提条件。\n\n"
         
-        prompt += "#### Atomic Actions ####\n"
-        prompt += "The atomic action functions are listed in the format of `name(arguments): description` as follows:\n"
+        prompt += "#### 原子操作 ####\n"
+        prompt += "原子操作函数以 `名称(参数): 描述` 的格式列出如下：\n"
 
         if info_pool.keyboard_pre:
             for action, value in ATOMIC_ACTION_SIGNITURES.items():
@@ -407,9 +407,9 @@ class Operator(BaseAgent):
             prompt += "NOTE: Unable to type. The keyboard has not been activated. To type, please activate the keyboard by tapping on an input box or using a shortcut, which includes tapping on an input box first.”\n"
         
         prompt += "\n"
-        prompt += "#### Shortcuts ####\n"
+        prompt += "#### 快捷方式 ####\n"
         if info_pool.shortcuts != {}:
-            prompt += "The shortcut functions are listed in the format of `name(arguments): description | Precondition: precondition` as follows:\n"
+            prompt += "快捷方式函数以 `名称(参数): 描述 | 前提条件: 前提条件` 的格式列出如下：\n"
             for shortcut, value in info_pool.shortcuts.items():
                 prompt += f"- {shortcut}({', '.join(value['arguments'])}): {value['description']} | Precondition: {value['precondition']}\n"
         else:

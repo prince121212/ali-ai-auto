@@ -3,10 +3,10 @@
 </p>
 
 <div align="center">
-  <h1>Mobile-Agent-E: Self-Evolving Mobile Assistant for Complex Tasks</h1>
+  <h1>Mobile-Agent-E: 自进化移动助手，专为复杂任务设计</h1>
 </div>
 
-<!-- # Mobile-Agent-E: Self-Evolving Mobile Assistant for Complex Tasks -->
+<!-- # Mobile-Agent-E: 自进化移动助手，专为复杂任务设计 -->
 <!-- <div align="center">
     <a href="https://huggingface.co/spaces/junyangwang0410/Mobile-Agent"><img src="https://huggingface.co/datasets/huggingface/badges/raw/main/open-in-hf-spaces-sm-dark.svg" alt="Open in Spaces"></a>
     <a href="https://modelscope.cn/studios/wangjunyang/Mobile-Agent-v2"><img src="assets/Demo-ModelScope-brightgreen.svg" alt="Demo ModelScope"></a>
@@ -47,40 +47,40 @@ Ming Yan<sup>2</sup>, Ji Zhang<sup>2</sup>, Fei Huang<sup>2</sup>, Heng Ji<sup>1
   <img src="static/images/new_teaser.png" alt="logo" width="900">
 </p>
 
-## 💻 Environment Setup
-❗We tested exclusively on **Android OS**. Mobile-Agent-E does not support **iOS** at this time.
+## 💻 环境设置
+❗我们仅在 **Android OS** 上进行了测试。Mobile-Agent-E 目前不支持 **iOS**。
 
-❗All experiments are done on a Samsung Galaxy A15 device, performance may vary on a different device. We encourage the users to custom the inital tips for your device and tasks.
+❗所有实验都在 Samsung Galaxy A15 设备上完成，在不同设备上的性能可能会有所差异。我们建议用户根据自己的设备和任务自定义初始提示。
 
-### Installation
+### 安装
 ```
 conda create -n mobile_agent_e python=3.10 -y
 conda activate mobile_agent_e
 pip install -r requirements.txt
 ```
 
-### Preparation for Connecting Mobile Device with ADB
+### 准备通过 ADB 连接移动设备
 
-1. Download the [Android Debug Bridge](https://developer.android.com/tools/releases/platform-tools?hl=en).
-2. Turn on the ADB debugging switch on your Android phone, it needs to be turned on in the developer options first.
-3. Connect your phone to the computer with a data cable and select "Transfer files".
-4. Test your ADB environment as follow: ```/path/to/adb devices```. If the connected devices are displayed, the preparation is complete.
-5. If you are using a MAC or Linux system, make sure to turn on adb permissions as follow: ```sudo chmod +x /path/to/adb```
-6. If you are using Windows system, the path will be ```xx/xx/adb.exe```
+1. 下载 [Android Debug Bridge](https://developer.android.com/tools/releases/platform-tools?hl=en)。
+2. 在您的 Android 手机上打开 ADB 调试开关，需要先在开发者选项中启用。
+3. 用数据线将手机连接到电脑，并选择"传输文件"。
+4. 测试您的 ADB 环境：```/path/to/adb devices```。如果显示已连接的设备，则准备工作完成。
+5. 如果您使用的是 MAC 或 Linux 系统，请确保开启 adb 权限：```sudo chmod +x /path/to/adb```
+6. 如果您使用的是 Windows 系统，路径将是 ```xx/xx/adb.exe```
 
-### Install the ADB Keyboard on your Mobile Device
-1. Download the ADB keyboard [apk](https://github.com/senzhk/adbkeyboard/blob/master/adbkeyboard.apk) installation package.
-2. Click the apk to install on your mobile device.
-3. Switch the default input method in the system settings to "ADB Keyboard".
+### 在您的移动设备上安装 ADB Keyboard
+1. 下载 ADB keyboard [apk](https://github.com/senzhk/adbkeyboard/blob/master/adbkeyboard.apk) 安装包。
+2. 点击 apk 在您的移动设备上安装。
+3. 在系统设置中将默认输入法切换为"ADB Keyboard"。
 
-### Agent Configs
-Please refer to the `# Edit your Setting #` section in `inference_agent_E.py` for all configs for customizing your agent. You can directly modify the macros or control some of them by setting the environment varibles as follows:
+### Agent 配置
+请参考 `inference_agent_E.py` 中的 `# Edit your Setting #` 部分来自定义您的 agent 的所有配置。您可以直接修改宏定义，或通过设置以下环境变量来控制其中一些配置：
 
-1. ADB Path
+1. ADB 路径
     ```
     export ADB_PATH="your/path/to/adb"
     ```
-2. Backbone model and API keys: you can choose from OpenAI, Gemini, and Claude; Set the corresponding keys as follows:
+2. 主干模型和 API 密钥：您可以从 OpenAI、Gemini 和 Claude 中选择；按如下方式设置相应的密钥：
     ```
     export BACKBONE_TYPE="OpenAI"
     export OPENAI_API_KEY="your-openai-key"
@@ -93,36 +93,36 @@ Please refer to the `# Edit your Setting #` section in `inference_agent_E.py` fo
     export BACKBONE_TYPE="Claude"
     export CLAUDE_API_KEY="your-claude-key"
     ```
-3. Perceptor: By default, the icon captioning model (`CAPTION_MODEL`) in Perceptor uses "qwen-vl-plus" from Qwen API:
-    - Follow this to get an [Qwen API Key](https://help.aliyun.com/document_detail/2712195.html?spm=a2c4g.2712569.0.0.5d9e730aymB3jH) 
-    - Set the Qwen API key:
+3. 感知器：默认情况下，感知器中的图标描述模型（`CAPTION_MODEL`）使用来自 Qwen API 的"qwen-vl-max"：
+    - 按照此链接获取 [Qwen API Key](https://help.aliyun.com/document_detail/2712195.html?spm=a2c4g.2712569.0.0.5d9e730aymB3jH)
+    - 设置 Qwen API 密钥：
         ```
         export QWEN_API_KEY="your-qwen-api-key"
         ```
-    - You can set the `CAPTION_MODEL` in `inference_agent_E.py` to "qwen-vl-max" for a better perception performance but with higher pricing.
-    - If you machine is equipped with a high-performance GPU, you can also choose to host the icon captioning model locally: (1) set the `CAPTION_CALL_METHOD` to "local"; (2) set `CAPTION_MODEL` to 'qwen-vl-chat' or 'qwen-vl-chat-int4' depending on the GPU spec.
+    - 您可以在 `inference_agent_E.py` 中将 `CAPTION_MODEL` 设置为"qwen-vl-max"以获得更好的感知性能，但价格更高。
+    - 如果您的机器配备了高性能 GPU，您也可以选择在本地托管图标描述模型：(1) 将 `CAPTION_CALL_METHOD` 设置为"local"；(2) 根据 GPU 规格将 `CAPTION_MODEL` 设置为'qwen-vl-chat'或'qwen-vl-chat-int4'。
 
-4. Customize initial Tips: You can tailor the tips for the agent to suit your specific device and needs. To do so, modify the `INIT_TIPS` in `inference_agent_E.py`. An example of customized tips for Chinese apps such as Xiaohongshu and Taobao are provided in `data/custom_tips_example_for_cn_apps.txt`.
+4. 自定义初始提示：您可以根据您的特定设备和需求定制 agent 的提示。为此，请修改 `inference_agent_E.py` 中的 `INIT_TIPS`。在 `data/custom_tips_example_for_cn_apps.txt` 中提供了针对小红书和淘宝等中文应用的自定义提示示例。
 
-## 🚀 Quick Start
+## 🚀 快速开始
 
-The agent can be run in both `individual` (performing a standalone task) or `evolution` (performing a sequence of tasks with evolution) settings. We provide example shell scripts as follows:
+agent 可以在 `individual`（执行独立任务）或 `evolution`（执行带有进化的任务序列）两种设置下运行。我们提供了以下示例 shell 脚本：
 
-- Run on a standalone task:
+- 运行独立任务：
     ```
     bash scripts/run_task.sh
     ```
 
-- Run on a sequence of tasks with self-evolution. This script loads in an toy example json file from `data/custom_tasks_example.json`.
+- 运行带有自进化的任务序列。此脚本加载来自 `data/custom_tasks_example.json` 的示例 json 文件。
     ```
     bash scripts/run_tasks_evolution.sh
     ```
 
-## 🤗 Mobile-Eval-E Benchmark
-The proposed Mobile-Eval-E benchmark can be found in `data/Mobile-Eval-E` and also on [Huggingface Datasets](https://huggingface.co/datasets/mikewang/mobile_eval_e).
+## 🤗 Mobile-Eval-E 基准测试
+提出的 Mobile-Eval-E 基准测试可以在 `data/Mobile-Eval-E` 中找到，也可以在 [Huggingface Datasets](https://huggingface.co/datasets/mikewang/mobile_eval_e) 上找到。
 
 
-## 📚 Citation
+## 📚 引用
 
 ```bibtex
 @article{wang2025mobile,

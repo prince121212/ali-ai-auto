@@ -4,21 +4,21 @@ from MobileAgentE.api import encode_image
 
 def init_action_chat():
     operation_history = []
-    sysetm_prompt = "You are a helpful AI mobile phone operating assistant. You need to help me operate the phone to complete the user\'s instruction."
+    sysetm_prompt = "您是一个有用的AI手机操作助手。您需要帮助我操作手机来完成用户的指令。"
     operation_history.append(["system", [{"type": "text", "text": sysetm_prompt}]])
     return operation_history
 
 
 def init_reflect_chat():
     operation_history = []
-    sysetm_prompt = "You are a helpful AI mobile phone operating assistant."
+    sysetm_prompt = "您是一个有用的AI手机操作助手。"
     operation_history.append(["system", [{"type": "text", "text": sysetm_prompt}]])
     return operation_history
 
 
 def init_memory_chat():
     operation_history = []
-    sysetm_prompt = "You are a helpful AI mobile phone operating assistant."
+    sysetm_prompt = "您是一个有用的AI手机操作助手。"
     operation_history.append(["system", [{"type": "text", "text": sysetm_prompt}]])
     return operation_history
 
