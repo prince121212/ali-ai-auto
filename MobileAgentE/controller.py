@@ -23,7 +23,7 @@ def start_recording(adb_path):
     print("Remove existing screenrecord.mp4")
     command = adb_path + " shell rm /sdcard/screenrecord.mp4"
     subprocess.run(command, capture_output=True, text=True, shell=True)
-    print("Start!")
+    print("开始!")
     # Use subprocess.Popen to allow terminating the recording process later
     command = adb_path + " shell screenrecord /sdcard/screenrecord.mp4"
     process = subprocess.Popen(command, shell=True)
@@ -62,7 +62,7 @@ def save_screenshot_to_file(adb_path, file_path="screenshot.png"):
     device_file = "/sdcard/screenshot.png"
     
     try:
-        # print("\tRemoving existing screenshot from the Android device...")
+        # print("\t 正在从安卓设备中删除现有截图...")
         command = adb_path + " shell rm /sdcard/screenshot.png"
         subprocess.run(command, capture_output=True, text=True, shell=True)
         time.sleep(0.5)
@@ -72,22 +72,22 @@ def save_screenshot_to_file(adb_path, file_path="screenshot.png"):
         result = subprocess.run(f"{adb_path} shell screencap -p {device_file}", capture_output=True, text=True, shell=True)
         time.sleep(0.5)
         if result.returncode != 0:
-            raise RuntimeError(f"Error: Failed to capture screenshot on the device. {result.stderr}")
+            raise RuntimeError(f"Error: 在设备上捕获屏幕截图失败. {result.stderr}")
         
         # Pull the screenshot to the local computer
         # print("\tTransferring screenshot to local computer...")
         result = subprocess.run(f"{adb_path} pull {device_file} {local_file}", capture_output=True, text=True, shell=True)
         time.sleep(0.5)
         if result.returncode != 0:
-            raise RuntimeError(f"Error: Failed to transfer screenshot to local computer. {result.stderr}")
+            raise RuntimeError(f"Error: 将截图传输到本地计算机失败. {result.stderr}")
         
         # Remove the screenshot from the device
         # print("\tRemoving screenshot from the Android device...")
         result = subprocess.run(f"{adb_path} shell rm {device_file}", capture_output=True, text=True, shell=True)
         if result.returncode != 0:
-            raise RuntimeError(f"Error: Failed to remove screenshot from the device. {result.stderr}")
+            raise RuntimeError(f"Error: 从设备中删除截图失败. {result.stderr}")
         
-        print(f"\tAtomic Operation Screenshot saved to {local_file}")
+        print(f"\t 原子操作截图已保存至 {local_file}")
         return local_file
     
     except Exception as e:

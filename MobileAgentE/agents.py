@@ -200,71 +200,71 @@ class Manager(BaseAgent):
             prompt += "逐步思考并制定一个高级计划来实现用户的指令。如果请求复杂，将其分解为子目标。如果请求涉及探索，包括具体的子目标来量化调查步骤。截图显示了手机的起始状态。\n\n"
             
             if info_pool.shortcuts != {}:
-                prompt += "### Available Shortcuts from Past Experience ###\n"
-                prompt += "We additionally provide some shortcut functionalities based on past experience. These shortcuts are predefined sequences of operations that might make the plan more efficient. Each shortcut includes a precondition specifying when it is suitable for use. If your plan implies the use of certain shortcuts, ensure that the precondition is fulfilled before using them. Note that you don't necessarily need to include the names of these shortcuts in your high-level plan; they are provided as a reference.\n"
+                prompt += "### 过往经验中的可用快捷方式 ###\n"
+                prompt += "我们还基于过往经验提供了一些快捷方式功能。这些快捷方式是预定义的操作序列，可能使计划更高效。每个快捷方式都包含一个前提条件，指定何时适合使用。如果您的计划暗示使用某些快捷方式，请确保在使用之前满足前提条件。请注意，您不一定需要在高级计划中包含这些快捷方式的名称；它们仅作为参考提供。\n"
                 for shortcut, value in info_pool.shortcuts.items():
-                    prompt += f"- {shortcut}: {value['description']} | Precondition: {value['precondition']}\n"
+                    prompt += f"- {shortcut}: {value['description']} | 前提条件: {value['precondition']}\n"
                 prompt += "\n"
             prompt += "---\n"
 
-            prompt += "Provide your output in the following format which contains three parts:\n\n"
-            prompt += "### Thought ###\n"
-            prompt += "A detailed explanation of your rationale for the plan and subgoals.\n\n"
-            prompt += "### Plan ###\n"
-            prompt += "1. first subgoal\n"
-            prompt += "2. second subgoal\n"
+            prompt += "请按以下格式提供您的输出，包含三个部分：\n\n"
+            prompt += "### 思考 ###\n"
+            prompt += "对您的计划和子目标理由的详细解释。\n\n"
+            prompt += "### 计划 ###\n"
+            prompt += "1. 第一个子目标\n"
+            prompt += "2. 第二个子目标\n"
             prompt += "...\n\n"
-            prompt += "### Current Subgoal ###\n"
-            prompt += "The first subgoal you should work on.\n\n"
+            prompt += "### 当前子目标 ###\n"
+            prompt += "您应该首先处理的子目标。\n\n"
         else:
             # continue planning
-            prompt += "### Current Plan ###\n"
+            prompt += "### 当前计划 ###\n"
             prompt += f"{info_pool.plan}\n\n"
-            prompt += "### Previous Subgoal ###\n"
+            prompt += "### 之前的子目标 ###\n"
             prompt += f"{info_pool.current_subgoal}\n\n"
-            prompt += f"### Progress Status ###\n"
+            prompt += f"### 进度状态 ###\n"
             prompt += f"{info_pool.progress_status}\n\n"
-            prompt += "### Important Notes ###\n"
+            prompt += "### 重要笔记 ###\n"
             if info_pool.important_notes != "":
                 prompt += f"{info_pool.important_notes}\n\n"
             else:
-                prompt += "No important notes recorded.\n\n"
+                prompt += "未记录重要笔记。\n\n"
             if info_pool.error_flag_plan:
-                prompt += "### Potentially Stuck! ###\n"
-                prompt += "You have encountered several failed attempts. Here are some logs:\n"
+                prompt += "### 可能卡住了！ ###\n"
+                prompt += "您遇到了几次失败的尝试。以下是一些日志：\n"
                 k = info_pool.err_to_manager_thresh
                 recent_actions = info_pool.action_history[-k:]
                 recent_summaries = info_pool.summary_history[-k:]
                 recent_err_des = info_pool.error_descriptions[-k:]
                 for i, (act, summ, err_des) in enumerate(zip(recent_actions, recent_summaries, recent_err_des)):
-                    prompt += f"- Attempt: Action: {act} | Description: {summ} | Outcome: Failed | Feedback: {err_des}\n"
+                    prompt += f"- 尝试: 操作: {act} | 描述: {summ} | 结果: 失败 | 反馈: {err_des}\n"
 
             prompt += "---\n"
-            prompt += "The sections above provide an overview of the plan you are following, the current subgoal you are working on, the overall progress made, and any important notes you have recorded. The screenshot displays the current state of the phone.\n"
-            prompt += "Carefully assess the current status to determine if the task has been fully completed. If the user's request involves exploration, ensure you have conducted sufficient investigation. If you are confident that no further actions are required, mark the task as \"Finished\" in your output. If the task is not finished, outline the next steps. If you are stuck with errors, think step by step about whether the overall plan needs to be revised to address the error.\n"
-            prompt += "NOTE: If the current situation prevents proceeding with the original plan or requires clarification from the user, make reasonable assumptions and revise the plan accordingly. Act as though you are the user in such cases.\n\n"
+            prompt += "上述部分提供了您正在遵循的计划、您正在处理的当前子目标、已取得的整体进度以及您记录的任何重要笔记的概述。截图显示了手机的当前状态。\n"
+            prompt += "仔细评估当前状态，以确定任务是否已完全完成。如果用户的请求涉及探索，请确保您已进行了充分的调查。如果您确信不需要进一步的操作，请在输出中将任务标记为\"已完成\"。如果任务未完成，请概述下一步。如果您遇到错误而卡住，请逐步思考是否需要修改整体计划来解决错误。\n"
+            prompt += "注意：如果当前情况阻止按原计划进行或需要用户澄清，请做出合理假设并相应修改计划。在这种情况下，请像用户一样行事。\n\n"
 
             if info_pool.shortcuts != {}:
-                prompt += "### Available Shortcuts from Past Experience ###\n"
-                prompt += "We additionally provide some shortcut functionalities based on past experience. These shortcuts are predefined sequences of operations that might make the plan more efficient. Each shortcut includes a precondition specifying when it is suitable for use. If your plan implies the use of certain shortcuts, ensure that the precondition is fulfilled before using them. Note that you don't necessarily need to include the names of these shortcuts in your high-level plan; they are provided only as a reference.\n"
+                prompt += "### 过往经验中的可用快捷方式 ###\n"
+                prompt += "我们还基于过往经验提供了一些快捷方式功能。这些快捷方式是预定义的操作序列，可能使计划更高效。每个快捷方式都包含一个前提条件，指定何时适合使用。如果您的计划暗示使用某些快捷方式，请确保在使用之前满足前提条件。请注意，您不一定需要在高级计划中包含这些快捷方式的名称；它们仅作为参考提供。\n"
                 for shortcut, value in info_pool.shortcuts.items():
-                    prompt += f"- {shortcut}: {value['description']} | Precondition: {value['precondition']}\n"
+                    prompt += f"- {shortcut}: {value['description']} | 前提条件: {value['precondition']}\n"
                 prompt += "\n"
             
             prompt += "---\n"
-            prompt += "Provide your output in the following format, which contains three parts:\n\n"
-            prompt += "### Thought ###\n"
-            prompt += "Provide a detailed explanation of your rationale for the plan and subgoals.\n\n"
-            prompt += "### Plan ###\n"
-            prompt += "If an update is required for the high-level plan, provide the updated plan here. Otherwise, keep the current plan and copy it here.\n\n"
-            prompt += "### Current Subgoal ###\n"
-            prompt += "The next subgoal to work on. If the previous subgoal is not yet complete, copy it here. If all subgoals are completed, write \"Finished\".\n"
+            prompt += "请按以下格式提供您的输出，包含三个部分：\n\n"
+            prompt += "### 思考 ###\n"
+            prompt += "对您的计划和子目标理由提供详细解释。\n\n"
+            prompt += "### 计划 ###\n"
+            prompt += "如果需要更新高级计划，请在此处提供更新的计划。否则，保持当前计划并在此处复制。\n\n"
+            prompt += "### 当前子目标 ###\n"
+            prompt += "要处理的下一个子目标。如果之前的子目标尚未完成，请在此处复制。如果所有子目标都已完成，请写\"已完成\"。\n"
         return prompt
 
     def parse_response(self, response: str) -> dict:
-        thought = response.split("### Thought ###")[-1].split("### Plan ###")[0].replace("\n", " ").replace("  ", " ").strip()
-        plan = response.split("### Plan ###")[-1].split("### Current Subgoal ###")[0].replace("\n", " ").replace("  ", " ").strip()
-        current_subgoal = response.split("### Current Subgoal ###")[-1].replace("\n", " ").replace("  ", " ").strip()
+        thought = response.split("### 思考 ###")[-1].split("### 计划 ###")[0].replace("\n", " ").replace("  ", " ").strip()
+        plan = response.split("### 计划 ###")[-1].split("### 当前子目标 ###")[0].replace("\n", " ").replace("  ", " ").strip()
+        current_subgoal = response.split("### 当前子目标 ###")[-1].replace("\n", " ").replace("  ", " ").strip()
         return {"thought": thought, "plan": plan, "current_subgoal": current_subgoal}
 
 
@@ -288,23 +288,23 @@ ATOMIC_ACTION_SIGNITURES = {
     },
     "Enter": {
         "arguments": [],
-        "description": lambda info: "Press the Enter key after typing (useful for searching)."
+        "description": lambda info: "输入后按回车键（对搜索很有用）。"
     },
     "Switch_App": {
         "arguments": [],
-        "description": lambda info: "Show the App switcher for switching between opened apps."
+        "description": lambda info: "显示应用切换器以在已打开的应用之间切换。"
     },
     "Back": {
         "arguments": [],
-        "description": lambda info: "Return to the previous state."
+        "description": lambda info: "返回到之前的状态。"
     },
     "Home": {
         "arguments": [],
-        "description": lambda info: "Return to home page."
+        "description": lambda info: "返回到主页。"
     },
     "Wait": {
         "arguments": [],
-        "description": lambda info: "Wait for 10 seconds to give more time for a page loading."
+        "description": lambda info: "等待10秒以给页面加载更多时间。"
     }
 }
 
@@ -329,7 +329,7 @@ class Operator(BaseAgent):
 
     def init_chat(self):
         operation_history = []
-        sysetm_prompt = "You are a helpful AI assistant for operating mobile phones. Your goal is to choose the correct actions to complete the user's instruction. Think as if you are a human user operating the phone."
+        sysetm_prompt = "您是一个用于操作手机的有用AI助手。您的目标是选择正确的操作来完成用户的指令。请像人类用户操作手机一样思考。"
         operation_history.append(["system", [{"type": "text", "text": sysetm_prompt}]])
         return operation_history
 
@@ -355,18 +355,18 @@ class Operator(BaseAgent):
             f"其宽度和高度分别为 {info_pool.width} 和 {info_pool.height} 像素。\n"
         )
         prompt += (
-            "To help you better understand the content in this screenshot, we have extracted positional information for the text elements and icons, including interactive elements such as search bars. "
-            "The format is: (coordinates; content). The coordinates are [x, y], where x represents the horizontal pixel position (from left to right) "
-            "and y represents the vertical pixel position (from top to bottom)."
+            "为了帮助您更好地理解此截图中的内容，我们已提取了文本元素和图标的位置信息，包括搜索栏等交互元素。"
+            "格式为：(坐标; 内容)。坐标为 [x, y]，其中 x 表示水平像素位置（从左到右），"
+            "y 表示垂直像素位置（从上到下）。"
         )
-        prompt += "The extracted information is as follows:\n"
+        prompt += "提取的信息如下：\n"
 
         for clickable_info in info_pool.perception_infos_pre:
             if clickable_info['text'] != "" and clickable_info['text'] != "icon: None" and clickable_info['coordinates'] != (0, 0):
                 prompt += f"{clickable_info['coordinates']}; {clickable_info['text']}\n"
         prompt += "\n"
         prompt += (
-            "Note that a search bar is often a long, rounded rectangle. If no search bar is presented and you want to perform a search, you may need to tap a search button, which is commonly represented by a magnifying glass.\n"
+            "请注意，搜索栏通常是一个长的圆角矩形。如果没有显示搜索栏而您想要执行搜索，您可能需要点击搜索按钮，通常用放大镜图标表示。\n"
             "另外，上述信息可能不完全准确。"
             "您应该结合截图来获得更好的理解。"
         )
@@ -404,21 +404,21 @@ class Operator(BaseAgent):
             for action, value in ATOMIC_ACTION_SIGNITURES.items():
                 if "Type" not in action:
                     prompt += f"- {action}({', '.join(value['arguments'])}): {value['description'](info_pool)}\n"
-            prompt += "NOTE: Unable to type. The keyboard has not been activated. To type, please activate the keyboard by tapping on an input box or using a shortcut, which includes tapping on an input box first.”\n"
+            prompt += "注意：无法输入。键盘尚未激活。要输入文字，请通过点击输入框或使用快捷方式来激活键盘，快捷方式包括首先点击输入框。”\n"
         
         prompt += "\n"
         prompt += "#### 快捷方式 ####\n"
         if info_pool.shortcuts != {}:
             prompt += "快捷方式函数以 `名称(参数): 描述 | 前提条件: 前提条件` 的格式列出如下：\n"
             for shortcut, value in info_pool.shortcuts.items():
-                prompt += f"- {shortcut}({', '.join(value['arguments'])}): {value['description']} | Precondition: {value['precondition']}\n"
+                prompt += f"- {shortcut}({', '.join(value['arguments'])}): {value['description']} | 前提条件: {value['precondition']}\n"
         else:
-            prompt += "No shortcuts are available.\n"
+            prompt += "没有可用的快捷方式。\n"
         prompt += "\n"
 
-        prompt += "### Latest Action History ###\n"
+        prompt += "### 最近操作历史 ###\n"
         if info_pool.action_history != []:
-            prompt += "Recent actions you took previously and whether they were successful:\n"
+            prompt += "您之前执行的最近操作及其是否成功：\n"
             num_actions = min(5, len(info_pool.action_history))
             latest_actions = info_pool.action_history[-num_actions:]
             latest_summary = info_pool.summary_history[-num_actions:]
@@ -427,30 +427,30 @@ class Operator(BaseAgent):
             action_log_strs = []
             for act, summ, outcome, err_des in zip(latest_actions, latest_summary, latest_outcomes, error_descriptions):
                 if outcome == "A":
-                    action_log_str = f"Action: {act} | Description: {summ} | Outcome: Successful\n"
+                    action_log_str = f"操作: {act} | 描述: {summ} | 结果: 成功\n"
                 else:
-                    action_log_str = f"Action: {act} | Description: {summ} | Outcome: Failed | Feedback: {err_des}\n"
+                    action_log_str = f"操作: {act} | 描述: {summ} | 结果: 失败 | 反馈: {err_des}\n"
                 prompt += action_log_str
                 action_log_strs.append(action_log_str)
             if latest_outcomes[-1] == "C" and "Tap" in action_log_strs[-1] and "Tap" in action_log_strs[-2]:
-                prompt += "\nHINT: If multiple Tap actions failed to make changes to the screen, consider using a \"Swipe\" action to view more content or use another way to achieve the current subgoal."
+                prompt += "\n提示：如果多次点击操作都未能改变屏幕，请考虑使用\"滑动\"操作查看更多内容，或使用其他方式实现当前子目标。"
             
             prompt += "\n"
         else:
-            prompt += "No actions have been taken yet.\n\n"
+            prompt += "尚未执行任何操作。\n\n"
 
         prompt += "---\n"
-        prompt += "Provide your output in the following format, which contains three parts:\n"
-        prompt += "### Thought ###\n"
-        prompt += "Provide a detailed explanation of your rationale for the chosen action. IMPORTANT: If you decide to use a shortcut, first verify that its precondition is met in the current phone state. For example, if the shortcut requires the phone to be at the Home screen, check whether the current screenshot shows the Home screen. If not, perform the appropriate atomic actions instead.\n\n"
+        prompt += "请按以下格式提供您的输出，包含三个部分：\n"
+        prompt += "### 思考 ###\n"
+        prompt += "详细解释您选择该操作的理由。重要提示：如果您决定使用快捷方式，请首先验证其前提条件在当前手机状态下是否满足。例如，如果快捷方式要求手机处于主屏幕，请检查当前截图是否显示主屏幕。如果不是，请执行相应的原子操作。\n\n"
 
-        prompt += "### Action ###\n"
-        prompt += "Choose only one action or shortcut from the options provided. IMPORTANT: Do NOT return invalid actions like null or stop. Do NOT repeat previously failed actions.\n"
-        prompt += "Use shortcuts whenever possible to expedite the process, but make sure that the precondition is met.\n"
-        prompt += "You must provide your decision using a valid JSON format specifying the name and arguments of the action. For example, if you choose to tap at position (100, 200), you should write {\"name\":\"Tap\", \"arguments\":{\"x\":100, \"y\":100}}. If an action does not require arguments, such as Home, fill in null to the \"arguments\" field. Ensure that the argument keys match the action function's signature exactly.\n\n"
+        prompt += "### 操作 ###\n"
+        prompt += "从提供的选项中仅选择一个操作或快捷方式。重要提示：不要返回无效操作如null或stop。不要重复之前失败的操作。\n"
+        prompt += "尽可能使用快捷方式来加快流程，但要确保满足前提条件。\n"
+        prompt += "您必须使用有效的JSON格式提供您的决定，指定操作的名称和参数。例如，如果您选择在位置(100, 200)点击，您应该写{\"name\":\"Tap\", \"arguments\":{\"x\":100, \"y\":100}}。如果操作不需要参数，如Home，请在\"arguments\"字段中填入null。确保参数键与操作函数的签名完全匹配。\n\n"
         
-        prompt += "### Description ###\n"
-        prompt += "A brief description of the chosen action and the expected outcome."
+        prompt += "### 描述 ###\n"
+        prompt += "对所选操作和预期结果的简要描述。"
         return prompt
 
     def execute_atomic_action(self, action: str, arguments: dict, **kwargs) -> None:
@@ -561,161 +561,161 @@ class Operator(BaseAgent):
             return None, 0, None
 
     def parse_response(self, response: str) -> dict:
-        thought = response.split("### Thought ###")[-1].split("### Action ###")[0].replace("\n", " ").replace("  ", " ").strip()
-        action = response.split("### Action ###")[-1].split("### Description ###")[0].replace("\n", " ").replace("  ", " ").strip()
-        description = response.split("### Description ###")[-1].replace("\n", " ").replace("  ", " ").strip()
+        thought = response.split("### 思考 ###")[-1].split("### 操作 ###")[0].replace("\n", " ").replace("  ", " ").strip()
+        action = response.split("### 操作 ###")[-1].split("### 描述 ###")[0].replace("\n", " ").replace("  ", " ").strip()
+        description = response.split("### 描述 ###")[-1].replace("\n", " ").replace("  ", " ").strip()
         return {"thought": thought, "action": action, "description": description}
 
 
 class ActionReflector(BaseAgent):
     def init_chat(self) -> list:
         operation_history = []
-        sysetm_prompt = "You are a helpful AI assistant for operating mobile phones. Your goal is to verify whether the last action produced the expected behavior and to keep track of the overall progress."
+        sysetm_prompt = "您是一个用于操作手机的有用AI助手。您的目标是验证最后一个操作是否产生了预期的行为，并跟踪整体进度。"
         operation_history.append(["system", [{"type": "text", "text": sysetm_prompt}]])
         return operation_history
 
     def get_prompt(self, info_pool: InfoPool) -> str:
-        prompt = "### User Instruction ###\n"
+        prompt = "### 用户指令 ###\n"
         prompt += f"{info_pool.instruction}\n\n"
 
-        prompt += "### Progress Status ###\n"
+        prompt += "### 进度状态 ###\n"
         if info_pool.progress_status != "":
             prompt += f"{info_pool.progress_status}\n\n"
         else:
-            prompt += "No progress yet.\n\n"
+            prompt += "尚无进度。\n\n"
 
-        prompt += "### Current Subgoal ###\n"
+        prompt += "### 当前子目标 ###\n"
         prompt += f"{info_pool.current_subgoal}\n\n"
 
         prompt += "---\n"
-        prompt += f"The attached two images are two phone screenshots before and after your last action. " 
-        prompt += f"The width and height are {info_pool.width} and {info_pool.height} pixels, respectively.\n"
+        prompt += f"附加的两张图像是您最后一个操作前后的两张手机截图。"
+        prompt += f"宽度和高度分别为 {info_pool.width} 和 {info_pool.height} 像素。\n"
         prompt += (
-            "To help you better perceive the content in these screenshots, we have extracted positional information for the text elements and icons. "
-            "The format is: (coordinates; content). The coordinates are [x, y], where x represents the horizontal pixel position (from left to right) "
-            "and y represents the vertical pixel position (from top to bottom).\n"
+            "为了帮助您更好地感知这些截图中的内容，我们已提取了文本元素和图标的位置信息。"
+            "格式为：(坐标; 内容)。坐标为 [x, y]，其中 x 表示水平像素位置（从左到右），"
+            "y 表示垂直像素位置（从上到下）。\n"
         )
         prompt += (
-            "Note that these information might not be entirely accurate. "
-            "You should combine them with the screenshots to gain a better understanding."
+            "请注意，这些信息可能不完全准确。"
+            "您应该结合截图来获得更好的理解。"
         )
         prompt += "\n\n"
 
-        prompt += "### Screen Information Before the Action ###\n"
+        prompt += "### 操作前屏幕信息 ###\n"
         for clickable_info in info_pool.perception_infos_pre:
             if clickable_info['text'] != "" and clickable_info['text'] != "icon: None" and clickable_info['coordinates'] != (0, 0):
                 prompt += f"{clickable_info['coordinates']}; {clickable_info['text']}\n"
         prompt += "\n"
-        prompt += "Keyboard status before the action: "
+        prompt += "操作前键盘状态："
         if info_pool.keyboard_pre:
-            prompt += "The keyboard has been activated and you can type."
+            prompt += "键盘已激活，您可以输入。"
         else:
-            prompt += "The keyboard has not been activated and you can\'t type."
+            prompt += "键盘尚未激活，您无法输入。"
         prompt += "\n\n"
 
 
-        prompt += "### Screen Information After the Action ###\n"
+        prompt += "### 操作后屏幕信息 ###\n"
         for clickable_info in info_pool.perception_infos_post:
             if clickable_info['text'] != "" and clickable_info['text'] != "icon: None" and clickable_info['coordinates'] != (0, 0):
                 prompt += f"{clickable_info['coordinates']}; {clickable_info['text']}\n"
         prompt += "\n"
-        prompt += "Keyboard status after the action: "
+        prompt += "操作后键盘状态："
         if info_pool.keyboard_post:
-            prompt += "The keyboard has been activated and you can type."
+            prompt += "键盘已激活，您可以输入。"
         else:
-            prompt += "The keyboard has not been activated and you can\'t type."
+            prompt += "键盘尚未激活，您无法输入。"
         prompt += "\n\n"
 
         prompt += "---\n"
-        prompt += "### Latest Action ###\n"
+        prompt += "### 最近操作 ###\n"
         # assert info_pool.last_action != ""
-        prompt += f"Action: {info_pool.last_action}\n"
-        prompt += f"Expectation: {info_pool.last_summary}\n\n"
+        prompt += f"操作：{info_pool.last_action}\n"
+        prompt += f"预期：{info_pool.last_summary}\n\n"
 
         prompt += "---\n"
         prompt += "Carefully examine the information provided above to determine whether the last action produced the expected behavior. If the action was successful, update the progress status accordingly. If the action failed, identify the failure mode and provide reasoning on the potential reason causing this failure. Note that for the “Swipe” action, it may take multiple attempts to display the expected content. Thus, for a \"Swipe\" action, if the screen shows new content, it usually meets the expectation.\n\n"
 
-        prompt += "Provide your output in the following format containing three parts:\n\n"
-        prompt += "### Outcome ###\n"
-        prompt += "Choose from the following options. Give your answer as \"A\", \"B\" or \"C\":\n"
-        prompt += "A: Successful or Partially Successful. The result of the last action meets the expectation.\n"
-        prompt += "B: Failed. The last action results in a wrong page. I need to return to the previous state.\n"
-        prompt += "C: Failed. The last action produces no changes.\n\n"
+        prompt += "请按以下格式提供您的输出，包含三个部分：\n\n"
+        prompt += "### 结果 ###\n"
+        prompt += "从以下选项中选择。请给出您的答案\"A\"、\"B\"或\"C\"：\n"
+        prompt += "A：成功或部分成功。最后一个操作的结果符合预期。\n"
+        prompt += "B：失败。最后一个操作导致进入错误页面。我需要返回到之前的状态。\n"
+        prompt += "C：失败。最后一个操作没有产生任何变化。\n\n"
 
-        prompt += "### Error Description ###\n"
-        prompt += "If the action failed, provide a detailed description of the error and the potential reason causing this failure. If the action succeeded, put \"None\" here.\n\n"
+        prompt += "### 错误描述 ###\n"
+        prompt += "如果操作失败，请提供错误的详细描述和导致此失败的潜在原因。如果操作成功，请在此处填写\"None\"。\n\n"
 
-        prompt += "### Progress Status ###\n"
-        prompt += "If the action was successful or partially successful, update the progress status. If the action failed, copy the previous progress status.\n"
+        prompt += "### 进度状态 ###\n"
+        prompt += "如果操作成功或部分成功，请更新进度状态。如果操作失败，请复制之前的进度状态。\n"
 
         return prompt
 
     def parse_response(self, response: str) -> dict:
-        outcome = response.split("### Outcome ###")[-1].split("### Error Description ###")[0].replace("\n", " ").replace("  ", " ").strip()
-        error_description = response.split("### Error Description ###")[-1].split("### Progress Status ###")[0].replace("\n", " ").replace("  ", " ").strip()
-        progress_status = response.split("### Progress Status ###")[-1].replace("\n", " ").replace("  ", " ").strip()
+        outcome = response.split("### 结果 ###")[-1].split("### 错误描述 ###")[0].replace("\n", " ").replace("  ", " ").strip()
+        error_description = response.split("### 错误描述 ###")[-1].split("### 进度状态 ###")[0].replace("\n", " ").replace("  ", " ").strip()
+        progress_status = response.split("### 进度状态 ###")[-1].replace("\n", " ").replace("  ", " ").strip()
         return {"outcome": outcome, "error_description": error_description, "progress_status": progress_status}
 
 
 class Notetaker(BaseAgent):
     def init_chat(self) -> list:
         operation_history = []
-        sysetm_prompt = "You are a helpful AI assistant for operating mobile phones. Your goal is to take notes of important content relevant to the user's request."
+        sysetm_prompt = "您是一个用于操作手机的有用AI助手。您的目标是记录与用户请求相关的重要内容。"
         operation_history.append(["system", [{"type": "text", "text": sysetm_prompt}]])
         return operation_history
 
     def get_prompt(self, info_pool: InfoPool) -> str:
-        prompt = "### User Instruction ###\n"
+        prompt = "### 用户指令 ###\n"
         prompt += f"{info_pool.instruction}\n\n"
 
-        prompt += "### Overall Plan ###\n"
+        prompt += "### 总体计划 ###\n"
         prompt += f"{info_pool.plan}\n\n"
 
-        prompt += "### Current Subgoal ###\n"
+        prompt += "### 当前子目标 ###\n"
         prompt += f"{info_pool.current_subgoal}\n\n"
 
-        prompt += "### Progress Status ###\n"
+        prompt += "### 进度状态 ###\n"
         prompt += f"{info_pool.progress_status}\n\n"
 
-        prompt += "### Existing Important Notes ###\n"
+        prompt += "### 现有重要笔记 ###\n"
         if info_pool.important_notes != "":
             prompt += f"{info_pool.important_notes}\n\n"
         else:
-            prompt += "No important notes recorded.\n\n"
+            prompt += "未记录重要笔记。\n\n"
 
-        prompt += "### Current Screen Information ###\n"
+        prompt += "### 当前屏幕信息 ###\n"
         prompt += (
-            f"The attached image is a screenshot showing the current state of the phone. "
-            f"Its width and height are {info_pool.width} and {info_pool.height} pixels, respectively.\n"
+            f"附加的图像是显示手机当前状态的截图。"
+            f"其宽度和高度分别为 {info_pool.width} 和 {info_pool.height} 像素。\n"
         )
         prompt += (
-            "To help you better perceive the content in this screenshot, we have extracted positional information for the text elements and icons. "
-            "The format is: (coordinates; content). The coordinates are [x, y], where x represents the horizontal pixel position (from left to right) "
-            "and y represents the vertical pixel position (from top to bottom)."
+            "为了帮助您更好地感知此截图中的内容，我们已提取了文本元素和图标的位置信息。"
+            "格式为：(坐标; 内容)。坐标为 [x, y]，其中 x 表示水平像素位置（从左到右），"
+            "y 表示垂直像素位置（从上到下）。"
         )
-        prompt += "The extracted information is as follows:\n"
+        prompt += "提取的信息如下：\n"
 
         for clickable_info in info_pool.perception_infos_post:
             if clickable_info['text'] != "" and clickable_info['text'] != "icon: None" and clickable_info['coordinates'] != (0, 0):
                 prompt += f"{clickable_info['coordinates']}; {clickable_info['text']}\n"
         prompt += "\n"
         prompt += (
-            "Note that this information might not be entirely accurate. "
-            "You should combine it with the screenshot to gain a better understanding."
+            "请注意，此信息可能不完全准确。"
+            "您应该结合截图来获得更好的理解。"
         )
         prompt += "\n\n"
 
         prompt += "---\n"
-        prompt += "Carefully examine the information above to identify any important content that needs to be recorded. IMPORTANT: Do not take notes on low-level actions; only keep track of significant textual or visual information relevant to the user's request.\n\n"
+        prompt += "仔细检查上述信息，以识别需要记录的任何重要内容。重要提示：不要记录低级操作；只跟踪与用户请求相关的重要文本或视觉信息。\n\n"
 
-        prompt += "Provide your output in the following format:\n"
-        prompt += "### Important Notes ###\n"
-        prompt += "The updated important notes, combining the old and new ones. If nothing new to record, copy the existing important notes.\n"
+        prompt += "请按以下格式提供您的输出：\n"
+        prompt += "### 重要笔记 ###\n"
+        prompt += "更新的重要笔记，结合旧的和新的。如果没有新内容需要记录，请复制现有的重要笔记。\n"
 
         return prompt
 
     def parse_response(self, response: str) -> dict:
-        important_notes = response.split("### Important Notes ###")[-1].replace("\n", " ").replace("  ", " ").strip()
+        important_notes = response.split("### 重要笔记 ###")[-1].replace("\n", " ").replace("  ", " ").strip()
         return {"important_notes": important_notes}
 
 
@@ -723,8 +723,8 @@ SHORTCUT_EXMPALE = """
 {
     "name": "Tap_Type_and_Enter",
     "arguments": ["x", "y", "text"],
-    "description": "Tap an input box at position (x, y), Type the \"text\", and then perform the Enter operation (useful for searching or sending messages).",
-    "precondition": "There is a text input box on the screen.",
+    "description": "点击位置 (x, y) 的输入框，输入\"text\"，然后执行回车操作（对搜索和发送消息很有用）。",
+    "precondition": "屏幕上有一个文本输入框。",
     "atomic_action_sequence":[
         {"name": "Tap", "arguments_map": {"x":"x", "y":"y"}},
         {"name": "Type", "arguments_map": {"text":"text"}},
@@ -737,36 +737,36 @@ SHORTCUT_EXMPALE = """
 class ExperienceReflectorShortCut(BaseAgent):
     def init_chat(self) -> list:
         operation_history = []
-        sysetm_prompt = "You are a helpful AI assistant specializing in mobile phone operations. Your goal is to reflect on past experiences and provide insights to improve future interactions."
+        sysetm_prompt = "您是一个专门从事手机操作的有用AI助手。您的目标是反思过去的经验并提供见解以改善未来的交互。"
         operation_history.append(["system", [{"type": "text", "text": sysetm_prompt}]])
         return operation_history
 
     def get_prompt(self, info_pool: InfoPool) -> str:
-        prompt = "### Current Task ###\n"
+        prompt = "### 当前任务 ###\n"
         prompt += f"{info_pool.instruction}\n\n"
 
-        prompt += "### Overall Plan ###\n"
+        prompt += "### 总体计划 ###\n"
         prompt += f"{info_pool.plan}\n\n"
 
-        prompt += "### Progress Status ###\n"
+        prompt += "### 进度状态 ###\n"
         prompt += f"{info_pool.progress_status}\n\n"
 
-        prompt += "### Atomic Actions ###\n"
-        prompt += "Here are the atomic actions in the format of `name(arguments): description` as follows:\n"
+        prompt += "### 原子操作 ###\n"
+        prompt += "以下是原子操作，格式为 `名称(参数): 描述`：\n"
         for action, value in ATOMIC_ACTION_SIGNITURES.items():
             prompt += f"{action}({', '.join(value['arguments'])}): {value['description'](info_pool)}\n"
         prompt += "\n"
 
-        prompt += "### Existing Shortcuts from Past Experience ###\n"
+        prompt += "### 过往经验中的现有快捷方式 ###\n"
         if info_pool.shortcuts != {}:
-            prompt += "Here are some existing shortcuts you have created:\n"
+            prompt += "以下是您已创建的一些现有快捷方式：\n"
             for shortcut, value in info_pool.shortcuts.items():
-                prompt += f"- {shortcut}({', '.join(value['arguments'])}): {value['description']} | Precondition: {value['precondition']}\n"
+                prompt += f"- {shortcut}({', '.join(value['arguments'])}): {value['description']} | 前提条件: {value['precondition']}\n"
         else:
-            prompt += "No shortcuts are provided.\n"
+            prompt += "未提供快捷方式。\n"
         prompt += "\n"
 
-        prompt += "### Full Action History ###\n"
+        prompt += "### 完整操作历史 ###\n"
         if info_pool.action_history != []:
             latest_actions = info_pool.action_history
             latest_summary = info_pool.summary_history
@@ -775,32 +775,32 @@ class ExperienceReflectorShortCut(BaseAgent):
             progress_status_history = info_pool.progress_status_history
             for act, summ, outcome, err_des, progress in zip(latest_actions, latest_summary, action_outcomes, error_descriptions, progress_status_history):
                 if outcome == "A":
-                    prompt += f"- Action: {act} | Description: {summ} | Outcome: Successful | Progress: {progress}\n"
+                    prompt += f"- 操作: {act} | 描述: {summ} | 结果: 成功 | 进度: {progress}\n"
                 else:
-                    prompt += f"- Action: {act} | Description: {summ} | Outcome: Failed | Feedback: {err_des}\n"
+                    prompt += f"- 操作: {act} | 描述: {summ} | 结果: 失败 | 反馈: {err_des}\n"
             prompt += "\n"
         else:
-            prompt += "No actions have been taken yet.\n\n"
+            prompt += "尚未执行任何操作。\n\n"
 
         if len(info_pool.future_tasks) > 0:
             prompt += "---\n"
-            prompt += "### Future Tasks ###\n"
-            prompt += "Here are some tasks that you might be asked to do in the future:\n"
+            prompt += "### 未来任务 ###\n"
+            prompt += "以下是您将来可能被要求执行的一些任务：\n"
             for task in info_pool.future_tasks:
                 prompt += f"- {task}\n"
             prompt += "\n"
 
         prompt += "---\n"
-        prompt += "Carefully reflect on the interaction history of the current task. Check if there are any subgoals that are accomplished by a sequence of successful actions and can be consolidated into new \"Shortcuts\" to improve efficiency for future tasks? These shortcuts are subroutines consisting of a series of atomic actions that can be executed under specific preconditions. For example, tap, type and enter text in a search bar or creating a new note in Notes."
+        prompt += "仔细反思当前任务的交互历史。检查是否有任何子目标是通过一系列成功操作完成的，并且可以合并为新的\"快捷方式\"以提高未来任务的效率？这些快捷方式是由一系列原子操作组成的子程序，可以在特定前提条件下执行。例如，在搜索栏中点击、输入和回车文本，或在Notes中创建新笔记。"
 
-        prompt += "Provide your output in the following format:\n\n"
+        prompt += "请按以下格式提供您的输出：\n\n"
 
-        prompt += "### New Shortcut ###\n"
-        prompt += "If you decide to create a new shortcut (not already in the existing shortcuts), provide your shortcut object in a valid JSON format which is detailed below. If not, put \"None\" here.\n"
-        prompt += "A shortcut object contains the following fields: name, arguments, description, precondition, and atomic_action_sequence. The keys in the arguements need to be unique. The atomic_action_sequence is a list of dictionaries, each containing the name of an atomic action and a mapping of its atomic argument names to the shortcut's argument name. If an atomic action in the atomic_action_sequence does not take any arugments, set the `arguments_map` to an empty dict. \n"
-        prompt += "IMPORTANT: The shortcut must ONLY include the Atomic Actions listed above. Create a new shortcut only if you are confident it will be useful in the future. Ensure that duplicated shortcuts with overly similar functionality are not included.\n"
-        prompt += "PRO TIP: Avoid creating shortcuts with too many arguments, such as involving multiple taps at different positions. All coordinate arguments required for the shortcut should be visible on the current screen. Imagine that when you start executing the shortcut, you are essentially blind.\n"
-        prompt += f"Follow the example below to format the shortcut. Avoid adding comments that could cause errors with json.loads().\n {SHORTCUT_EXMPALE}\n\n"
+        prompt += "### 新快捷方式 ###\n"
+        prompt += "如果您决定创建一个新的快捷方式（不在现有快捷方式中），请以有效的JSON格式提供您的快捷方式对象，详细信息如下。如果不创建，请在此处填写\"None\"。\n"
+        prompt += "快捷方式对象包含以下字段：name、arguments、description、precondition和atomic_action_sequence。参数中的键需要是唯一的。atomic_action_sequence是一个字典列表，每个字典包含原子操作的名称以及其原子参数名称到快捷方式参数名称的映射。如果atomic_action_sequence中的原子操作不需要任何参数，请将`arguments_map`设置为空字典。\n"
+        prompt += "重要提示：快捷方式必须仅包含上面列出的原子操作。只有在您确信它对未来有用时才创建新的快捷方式。确保不包含功能过于相似的重复快捷方式。\n"
+        prompt += "专业提示：避免创建参数过多的快捷方式，例如涉及在不同位置的多次点击。快捷方式所需的所有坐标参数都应在当前屏幕上可见。想象一下，当您开始执行快捷方式时，您基本上是盲目的。\n"
+        prompt += f"按照下面的示例格式化快捷方式。避免添加可能导致json.loads()错误的注释。\n {SHORTCUT_EXMPALE}\n\n"
         return prompt
 
     def add_new_shortcut(self, short_cut_str: str, info_pool: InfoPool) -> str:
@@ -818,34 +818,34 @@ class ExperienceReflectorShortCut(BaseAgent):
         print("Updated short_cuts:", info_pool.shortcuts)
 
     def parse_response(self, response: str) -> dict:
-        new_shortcut = response.split("### New Shortcut ###")[-1].replace("\n", " ").replace("  ", " ").strip()
+        new_shortcut = response.split("### 新快捷方式 ###")[-1].replace("\n", " ").replace("  ", " ").strip()
         return {"new_shortcut": new_shortcut}
 
 
 class ExperienceReflectorTips(BaseAgent):
     def init_chat(self) -> list:
         operation_history = []
-        sysetm_prompt = "You are a helpful AI assistant specializing in mobile phone operations. Your goal is to reflect on past experiences and provide insights to improve future interactions."
+        sysetm_prompt = "您是一个专门从事手机操作的有用AI助手。您的目标是反思过去的经验并提供见解以改善未来的交互。"
         operation_history.append(["system", [{"type": "text", "text": sysetm_prompt}]])
         return operation_history
 
     def get_prompt(self, info_pool: InfoPool) -> str:
-        prompt = "### Current Task ###\n"
+        prompt = "### 当前任务 ###\n"
         prompt += f"{info_pool.instruction}\n\n"
 
-        prompt += "### Overall Plan ###\n"
+        prompt += "### 总体计划 ###\n"
         prompt += f"{info_pool.plan}\n\n"
 
-        prompt += "### Progress Status ###\n"
+        prompt += "### 进度状态 ###\n"
         prompt += f"{info_pool.progress_status}\n\n"
     
-        prompt += "### Existing Tips from Past Experience ###\n"
+        prompt += "### 过往经验中的现有提示 ###\n"
         if info_pool.tips != "":
             prompt += f"{info_pool.tips}\n\n"
         else:
-            prompt += "No tips recorded.\n\n"
+            prompt += "未记录提示。\n\n"
 
-        prompt += "### Full Action History ###\n"
+        prompt += "### 完整操作历史 ###\n"
         if info_pool.action_history != []:
             latest_actions = info_pool.action_history
             latest_summary = info_pool.summary_history
@@ -854,63 +854,63 @@ class ExperienceReflectorTips(BaseAgent):
             progress_status_history = info_pool.progress_status_history
             for act, summ, outcome, err_des, progress in zip(latest_actions, latest_summary, action_outcomes, error_descriptions, progress_status_history):
                 if outcome == "A":
-                    prompt += f"- Action: {act} | Description: {summ} | Outcome: Successful | Progress: {progress}\n"
+                    prompt += f"- 操作: {act} | 描述: {summ} | 结果: 成功 | 进度: {progress}\n"
                 else:
-                    prompt += f"- Action: {act} | Description: {summ} | Outcome: Failed | Feedback: {err_des}\n"
+                    prompt += f"- 操作: {act} | 描述: {summ} | 结果: 失败 | 反馈: {err_des}\n"
             prompt += "\n"
         else:
-            prompt += "No actions have been taken yet.\n\n"
+            prompt += "尚未执行任何操作。\n\n"
             
         if len(info_pool.future_tasks) > 0:
             prompt += "---\n"
             # if the setting provides future tasks explicitly
-            prompt += "### Future Tasks ###\n"
-            prompt += "Here are some tasks that you might be asked to do in the future:\n"
+            prompt += "### 未来任务 ###\n"
+            prompt += "以下是您将来可能被要求执行的一些任务：\n"
             for task in info_pool.future_tasks:
                 prompt += f"- {task}\n"
             prompt += "\n"
 
         prompt += "---\n"
-        prompt += "Carefully reflect on the interaction history of the current task. Check if there are any general tips that might be useful for handling future tasks, such as advice on preventing certain common errors?\n\n"
+        prompt += "仔细反思当前任务的交互历史。检查是否有任何通用提示可能对处理未来任务有用，例如关于防止某些常见错误的建议？\n\n"
 
-        prompt += "Provide your output in the following format:\n\n"
+        prompt += "请按以下格式提供您的输出：\n\n"
 
-        prompt += "### Updated Tips ###\n"
-        prompt += "If you have any important new tips to add (not already included in the existing tips), combine them with the current list. If there are no new tips, simply copy the existing tips here. Keep your tips concise and general.\n"
+        prompt += "### 更新的提示 ###\n"
+        prompt += "如果您有任何重要的新提示要添加（不在现有提示中），请将它们与当前列表结合。如果没有新提示，只需在此处复制现有提示。保持您的提示简洁和通用。\n"
         return prompt
 
     def parse_response(self, response: str) -> dict:
-        updated_tips = response.split("### Updated Tips ###")[-1].replace("\n", " ").replace("  ", " ").strip()
+        updated_tips = response.split("### 更新的提示 ###")[-1].replace("\n", " ").replace("  ", " ").strip()
         return {"updated_tips": updated_tips}
 
 
 class ExperienceRetrieverShortCut(BaseAgent):
     def init_chat(self) -> list:
         operation_history = []
-        sysetm_prompt = "You are a helpful AI assistant specializing in mobile phone operations. Your goal is to select relevant shortcuts from previous experience to the current task."
+        sysetm_prompt = "您是一个专门从事手机操作的有用AI助手。您的目标是从过往经验中选择与当前任务相关的快捷方式。"
         operation_history.append(["system", [{"type": "text", "text": sysetm_prompt}]])
         return operation_history
 
     def get_prompt(self, instruction, shortcuts) -> str:
         
-        prompt = "### Existing Shortcuts from Past Experience ###\n"
+        prompt = "### 过往经验中的现有快捷方式 ###\n"
         for shortcut, value in shortcuts.items():
-            prompt += f"- Name: {shortcut} | Description: {value['description']}\n"
-        
+            prompt += f"- 名称: {shortcut} | 描述: {value['description']}\n"
+
         prompt += "\n"
-        prompt += "### Current Task ###\n"
+        prompt += "### 当前任务 ###\n"
         prompt += f"{instruction}\n\n"
 
         prompt += "---\n"
-        prompt += "Carefully examine the information provided above to pick the shortcuts that can be helpful to the current task. Remove shortcuts that are irrelevant to the current task.\n"
+        prompt += "仔细检查上述提供的信息，选择对当前任务有帮助的快捷方式。删除与当前任务无关的快捷方式。\n"
 
-        prompt += "Provide your output in the following format:\n\n"
-        prompt += "### Selected Shortcuts ###\n"
-        prompt += "Provide your answer as a list of selected shortcut names: [\"shortcut1\", \"shortcut2\", ...]. If there are no relevant shortcuts, put \"None\" here.\n"
+        prompt += "请按以下格式提供您的输出：\n\n"
+        prompt += "### 选定的快捷方式 ###\n"
+        prompt += "以选定快捷方式名称列表的形式提供您的答案：[\"shortcut1\", \"shortcut2\", ...]。如果没有相关的快捷方式，请在此处填写\"None\"。\n"
         return prompt
     
     def parse_response(self, response: str) -> dict:
-        selected_shortcuts_str = response.split("### Selected Shortcuts ###")[-1].replace("\n", " ").replace("  ", " ").strip()
+        selected_shortcuts_str = response.split("### 选定的快捷方式 ###")[-1].replace("\n", " ").replace("  ", " ").strip()
         try:
             selected_shortcut_names = extract_json_object(selected_shortcuts_str, json_type="list")
             selected_shortcut_names = [s.strip() for s in selected_shortcut_names]
@@ -923,27 +923,27 @@ class ExperienceRetrieverShortCut(BaseAgent):
 class ExperienceRetrieverTips(BaseAgent):
     def init_chat(self) -> list:
         operation_history = []
-        sysetm_prompt = "You are a helpful AI assistant specializing in mobile phone operations. Your goal is to select relevant tips from previous experience to the current task."
+        sysetm_prompt = "您是一个专门从事手机操作的有用AI助手。您的目标是从过往经验中选择与当前任务相关的提示。"
         operation_history.append(["system", [{"type": "text", "text": sysetm_prompt}]])
         return operation_history
 
     def get_prompt(self, instruction, tips) -> str:
-        prompt = "### Existing Tips from Past Experience ###\n"
+        prompt = "### 过往经验中的现有提示 ###\n"
         prompt += f"{tips}\n\n"
-        
+
         prompt += "\n"
-        prompt += "### Current Task ###\n"
+        prompt += "### 当前任务 ###\n"
         prompt += f"{instruction}\n\n"
 
         prompt += "---\n"
-        prompt += "Carefully examine the information provided above to pick the tips that can be helpful to the current task. Remove tips that are irrelevant to the current task.\n"
+        prompt += "仔细检查上述提供的信息，选择对当前任务有帮助的提示。删除与当前任务无关的提示。\n"
 
-        prompt += "Provide your output in the following format:\n\n"
-        prompt += "### Selected Tips ###\n"
-        prompt += "Tips that are generally useful and relevant to the current task. Feel free to reorganize the bullets. If there are no relevant tips, put \"None\" here.\n"
+        prompt += "请按以下格式提供您的输出：\n\n"
+        prompt += "### 选定的提示 ###\n"
+        prompt += "通常有用且与当前任务相关的提示。可以随意重新组织要点。如果没有相关提示，请在此处填写\"None\"。\n"
 
         return prompt
     
     def parse_response(self, response: str) -> dict:
-        selected_tips = response.split("### Selected Tips ###")[-1].replace("\n", " ").replace("  ", " ").strip()        
+        selected_tips = response.split("### 选定的提示 ###")[-1].replace("\n", " ").replace("  ", " ").strip()
         return {"selected_tips": selected_tips}

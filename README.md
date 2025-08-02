@@ -151,3 +151,8 @@ agent 可以在 `individual`（执行独立任务）或 `evolution`（执行带�
   year={2025}
 }
 ```
+
+
+启动项目：
+. .\config_local.ps1
+python run.py --instruction "打开微信" --run_name "test"

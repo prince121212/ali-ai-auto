@@ -6,7 +6,7 @@ $env:ADB_PATH = "C:\apps\adb\platform-tools\adb.exe"  # Windows default path
 # $env:ADB_PATH = "adb"  # If adb is in PATH, use this
 
 # Select backend model type
-$env:BACKBONE_TYPE = "Qwen"  # Options: "OpenAI", "Gemini", "Claude", "Qwen", "GLM"
+$env:BACKBONE_TYPE = "Doubao"  # Options: "OpenAI", "Gemini", "Claude", "Qwen", "GLM", "Doubao"
 
 # === API Key Configuration (Required) ===
 
@@ -17,6 +17,9 @@ $env:DASHSCOPE_API_KEY = "sk-a087535b2bc749f1aee28526cd151e7a"
 
 # GLM API key (Zhipu AI)
 $env:GLM_API_KEY = "fbade139fe614df5b1581156edbf673e.Y0T8dlxYMEiCyfsQ"
+
+# Doubao API key
+$env:Doubao_API_KEY = "7f1342d5-b912-4100-9040-4ae8bb3dd610"
 
 # Display configuration status
 Write-Host "=== Mobile-Agent-E Configuration Loaded ===" -ForegroundColor Green
